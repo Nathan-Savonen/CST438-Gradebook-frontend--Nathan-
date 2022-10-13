@@ -48,6 +48,39 @@ class Assignment extends React.Component {
     console.log("Assignment.onRadioClick " + event.target.value);
     this.setState({selected: event.target.value});
   }
+
+  newAssignment = (assignment) => {
+    const token = Cookies.get('XSRF-TOKEN');
+    fetch(`${SERVER_URL}/assignment`, 
+      {  
+        method: 'POST', 
+        headers: 
+        { 
+          'X-XSRF-TOKEN': token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(assignment)
+      } )
+    .then(res => {
+        if (res.ok) {
+          toast.success("Assignment successfully added", {
+              position: toast.POSITION.BOTTOM_LEFT
+          });
+          this.fetchAssignments();
+        } else {
+          toast.error("Error new assignment failed.", {
+              position: toast.POSITION.BOTTOM_LEFT
+          });
+          console.error('Post http status =' + res.status);
+        }})
+    .catch(err => {
+      toast.error("Error new assignment failed.", {
+            position: toast.POSITION.BOTTOM_LEFT
+        });
+        console.error(err);
+    })
+  }    
+
   
   render() {
      const columns = [
@@ -87,6 +120,7 @@ class Assignment extends React.Component {
                     variant="outlined" color="primary"  style={{margin: 10}}>
               Add Assignment
             </Button>
+            <AddAssignment  add={this.newAssignment} />
             <ToastContainer autoClose={1500} /> 
           </div>
       )
